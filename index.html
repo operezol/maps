@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maps</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <style>
+      html,
+      body,
+      #mapid {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mapid"></div>
+    <script>
+      let poligonDataSet = [];
+
+      const returnPosition = (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const maxLatBound = latitude + 0.1;
+        const minLatBound = latitude - 0.1;
+        const maxLongBound = longitude + 0.1;
+        const minLongBound = longitude - 0.1;
+
+        const poligonBoundaries = [
+          [maxLatBound, maxLongBound],
+          [minLatBound, maxLongBound],
+          [minLatBound, minLongBound],
+          [maxLatBound, minLongBound],
+        ];
+
+        const maxLatHole = latitude + 0.0001;
+        const minLatHole = latitude - 0.0001;
+        const maxLongHole = longitude + 0.0001;
+        const minLongHole = longitude - 0.0001;
+
+        const poligonHole = [
+          [maxLatHole, maxLongHole],
+          [minLatHole, maxLongHole],
+          [minLatHole, minLongHole],
+          [maxLatHole, minLongHole],
+        ];
+
+        poligonDataSet.push(poligonBoundaries);
+        poligonDataSet.push(poligonHole);
+
+        const mymap = L.map("mapid", {
+          dragging: false,
+        }).setView([position.coords.latitude, position.coords.longitude], 22);
+
+        const MAP_API_TOKEN = `pk.eyJ1Ijoib3BlcmV6b2wiLCJhIjoiY2txeml6bDVsMDdtbzJ0bGd3a3gxbHJxNCJ9.uYL51pfHlejdqNMMbPfJOA`;
+        L.tileLayer(
+          `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}`,
+          {
+            attribution:
+              'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+              maxZoom: 22,
+              minZoom: 1,
+            id: "mapbox/streets-v11",
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: MAP_API_TOKEN,
+          }
+        ).addTo(mymap);
+        let poligon = L.polygon(poligonDataSet, {
+          stroke: false,
+          fill: true,
+          fillColor: "#000",
+          fillOpacity: 1,
+        }).addTo(mymap);
+        mymap.dragging.disable();
+      mymap.on('zoomend',(e)=>{console.log(e.target._zoom)})
+
+      };
+      navigator.geolocation.getCurrentPosition(returnPosition);
+    </script>
+  </body>
+</html>
