@@ -30,7 +30,7 @@
   <body>
     <div id="mapid"></div>
     <script>
-      let poligonDataSet = [];
+      let poligonHolesDataSet = [];
 
       const returnPosition = (position) => {
         const latitude = position.coords.latitude;
@@ -60,8 +60,8 @@
           [maxLatHole, minLongHole],
         ];
 
-        poligonDataSet.push(poligonBoundaries);
-        poligonDataSet.push(poligonHole);
+        poligonHolesDataSet.push(poligonBoundaries);
+        poligonHolesDataSet.push(poligonHole);
 
         const mymap = L.map("mapid", {
           dragging: false,
@@ -81,7 +81,7 @@
             accessToken: MAP_API_TOKEN,
           }
         ).addTo(mymap);
-        let poligon = L.polygon(poligonDataSet, {
+        let poligon = L.polygon(poligonHolesDataSet, {
           stroke: false,
           fill: true,
           fillColor: "#000",
