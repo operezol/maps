@@ -31,7 +31,11 @@
     <div id="map"></div>
 
     <script>
+      //Set & initialize global variables
+
       const MAP_API_TOKEN = `pk.eyJ1Ijoib3BlcmV6b2wiLCJhIjoiY2txeml6bDVsMDdtbzJ0bGd3a3gxbHJxNCJ9.uYL51pfHlejdqNMMbPfJOA`;
+      let zoomLevel = 22;
+      let locations = [];
 
       // Inits the leaflet map library
 
@@ -42,7 +46,7 @@
       L.tileLayer(
         `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${MAP_API_TOKEN}`,
         {
-          maxZoom: 22,
+          maxZoom: zoomLevel,
           attribution:
             'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -57,13 +61,9 @@
       // Define the Event handlers for the map
 
       const onLocationFound = (e) => {
-        console.log(
-          "Location Found: ",
-          "Latitude: ",
-          e.latitude,
-          " Longitude: ",
-          e.longitude
-        );
+        console.log(e.latitude, e.longitude)
+        locations.push([e.latitude, e.longitude]);
+        onViewreset();
       };
 
       const onLocationError = (e) => {
@@ -71,23 +71,32 @@
       };
 
       const onZoomend = (e) => {
-        console.log("zoom: ", e.target._zoom);
+        zoomLevel = e.target._zoom;
+        console.log(zoomLevel);
+        onViewreset();
       };
 
       const onResize = (e) => {
         console.log("Resize: ", e);
+        onViewreset();
       };
 
       const onUnload = (e) => {
         console.log("Unload: ", e);
       };
-
-      const onViewreset = (e) => {
-        console.log("View Reset: ", e);
-        console.log('SouthWest: ',map.getBounds().getSouthWest());
-        console.log('NorthEast: ',map.getBounds().getNorthEast());
-        console.log('NorthWest: ',map.getBounds().getNorthWest());
-        console.log('SouthEast: ',map.getBounds().getSouthEast());
+      let polygon = L.polygon([]).addTo(map);
+      const onViewreset = () => {
+        console.log("On view Reset");
+        southWest = map.getBounds().getSouthWest();
+        northEast = map.getBounds().getNorthEast();
+        northWest = map.getBounds().getNorthWest();
+        southEast = map.getBounds().getSouthEast();
+        const poligonBoundaries = [southWest, northWest, northEast, southEast];
+        map.removeLayer(polygon);
+        polygon = L.polygon([poligonBoundaries, locations], {
+          fillColor: "black",
+          fillOpacity: 1,
+        }).addTo(map);
       };
 
       // Assign Event handlers to map
@@ -106,7 +115,7 @@
 
       // Get current Coordinates petition
 
-      map.locate({ setView: true, maxZoom: 22, watch: true });
+      map.locate({ setView: true, maxZoom: zoomLevel, watch: true });
     </script>
   </body>
 </html>
