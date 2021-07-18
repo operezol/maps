@@ -101,22 +101,38 @@
 
       const getPoligonHoles = (locations) => {
         let poligonHoles = [];
+        let hole = [];
         for (var i = 0; i < locations.length; i++) {
-          let hole = [];
           if (i > 0) {
             hole.push(locations[i - 1]);
+            console.log("Hole Point Inserted into hole points: ", hole);
             let distanceBetweenPoligonHoles = getDistanceFromLatLonInMeters(
               locations[i - 1],
               locations[i]
             );
+            console.log(
+              "distanceBetweenPoligonHoles: ",
+              distanceBetweenPoligonHoles
+            );
             if (distanceBetweenPoligonHoles > 500) {
+              console.log(
+                "La distancia es mayor a 500 y se procede a crear un nuevo hole y guardar si tiene más de 2 puntos"
+              );
               if (hole.length > 2) {
                 poligonHoles.push(hole);
+                console.log(
+                  "last hole added because next point is further than 500 meters",
+                  hole
+                );
               }
               hole = [];
             }
           }
         }
+        if (hole.length > 2) {
+          poligonHoles.push(hole);
+        }
+        console.log("Poligon Holes: ", poligonHoles);
         return poligonHoles;
       };
 
@@ -131,10 +147,19 @@
 
       //Initialize location history or retrieve it from localstorage
 
-      let locations;
-      localStorage.getItem("locationsHistory") === null
-        ? (locations = [])
-        : (locations = JSON.parse(localStorage.getItem("locationsHistory")));
+      let locations =
+        localStorage.getItem("locationsHistory") === null
+          ? (() => {
+              let dummyLocations = [];
+              for (let index = 0; index < 100; index++) {
+                dummyLocations.push([
+                  41.43 + Math.random() / 100,
+                  2.21 + Math.random() / 100,
+                ]);
+              }
+              return dummyLocations;
+            })()
+          : JSON.parse(localStorage.getItem("locationsHistory"));
 
       // Initialize  tridimensional array for Poligon holes
 
@@ -180,6 +205,7 @@
         locations.push([e.latitude, e.longitude]);
         locations = sortLocations(locations);
         locations = removeInBetweenLocations(locations);
+        poligonHoles = getPoligonHoles(locations);
         saveLocationsOnLocalstorage();
         redrawPoligon();
       };
@@ -210,7 +236,6 @@
       const redrawPoligon = () => {
         console.log("Redraw Poligon");
         const poligonBoundaries = getPoligonBoundaries();
-        poligonHoles = getPoligonHoles(locations);
         map.removeLayer(polygon);
         polygon = L.polygon([poligonBoundaries, poligonHoles], {
           fillColor: "black",
