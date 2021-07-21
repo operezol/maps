@@ -95,6 +95,9 @@ const orderPoligonHoleLocations = () => {
   let trimedLonDesc = trimLonDesc(sortedLonDesc);
   locationsHistory = [...trimedLonAsc, ...trimedLonDesc];
 };
+
+orderPoligonHoleLocations();
+
 const getPoligonBoundaries = () => {
   let southWest = map.getBounds().getSouthWest();
   let northEast = map.getBounds().getNorthEast();
@@ -104,6 +107,7 @@ const getPoligonBoundaries = () => {
 };
 const redrawPoligon = () => {
   const poligonBoundaries = getPoligonBoundaries();
+  orderPoligonHoleLocations();
   map.removeLayer(polygon);
   polygon = L.polygon([poligonBoundaries, locationsHistory], {
     fillColor: "black",
@@ -113,6 +117,7 @@ const redrawPoligon = () => {
 };
 const saveLocationsOnLocalstorage = () => {
   if (locationsHistory) {
+    orderPoligonHoleLocations();
     let strigifiedLocations = JSON.stringify(locationsHistory);
     localStorage.setItem("locationsHistory", strigifiedLocations);
   }
@@ -128,6 +133,7 @@ const onLocationError = (e) => {
 };
 const onZoomend = (e) => {
   zoomLevel = e.target._zoom;
+  orderPoligonHoleLocations();
   redrawPoligon();
 };
 let map = L.map("map").fitWorld();
