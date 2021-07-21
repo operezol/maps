@@ -23,8 +23,10 @@ const getAverageLat = () => {
     if (maxLat < currentLat) maxLat = currentLat;
     if (minLat > currentLat) minLat = currentLat;
     averageLat += currentLat;
+    console.log(maxLat,currentLat,minLat);
   }
   averageLat = averageLat / locationsHistory.length;
+  console.log(averageLat);
   return averageLat;
 };
 
@@ -94,9 +96,8 @@ const orderPoligonHoleLocations = () => {
   let trimedLonAsc = trimLonAsc(sortedLonAsc);
   let trimedLonDesc = trimLonDesc(sortedLonDesc);
   locationsHistory = [...trimedLonAsc, ...trimedLonDesc];
+  console.log(averageLat, aboveAverageLat, belowAverageLat, sortedLonAsc, sortedLonDesc, trimedLonAsc, trimedLonDesc, locationsHistory);
 };
-
-orderPoligonHoleLocations();
 
 const getPoligonBoundaries = () => {
   let southWest = map.getBounds().getSouthWest();
