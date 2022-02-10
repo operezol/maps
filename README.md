@@ -1,3 +1,2 @@
 # maps
- 
-It uncovers your position on the maps while you're moving
+It uncovers your position on the map while you're moving
